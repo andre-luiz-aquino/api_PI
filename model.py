@@ -3,7 +3,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-# Função para criar um novo usuário
+
 def criar_codigo(nome, codigos):
     conn = sqlite3.connect('mqtt.db')
     cursor = conn.cursor()
@@ -11,7 +11,7 @@ def criar_codigo(nome, codigos):
     conn.commit()
     conn.close()
 
-# Função para obter todos os usuários
+
 def buscar_todos_codigos():
     conn = sqlite3.connect('mqtt.db')
     cursor = conn.cursor()
@@ -19,8 +19,15 @@ def buscar_todos_codigos():
     users = cursor.fetchall()
     conn.close()
     return users
+def buscar_todos_horarios():
+    conn = sqlite3.connect('mqtt.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM horarios')
+    users = cursor.fetchall()
+    conn.close()
+    return users
 
-# Função para obter um usuário pelo ID
+
 def buscar_codigo_id(id):
     conn = sqlite3.connect('mqtt.db')
     cursor = conn.cursor()
@@ -29,7 +36,7 @@ def buscar_codigo_id(id):
     conn.close()
     return cod
 
-# Função para atualizar informações de um usuário
+
 def redefenir(id, nome, codigos):
     conn = sqlite3.connect('mqtt.db')
     cursor = conn.cursor()
@@ -37,7 +44,6 @@ def redefenir(id, nome, codigos):
     conn.commit()
     conn.close()
 
-# Função para excluir um usuário pelo ID
 def deletar_codigo(id):
     conn = sqlite3.connect('mqtt.db')
     cursor = conn.cursor()
@@ -50,6 +56,11 @@ def deletar_codigo(id):
 @app.route('/cod', methods=['GET'])
 def buscar_cod():
     cod = buscar_todos_codigos()
+    return jsonify({'cod': cod})
+
+@app.route('/hor', methods=['GET'])
+def buscar_hor():
+    cod = buscar_todos_horarios()
     return jsonify({'cod': cod})
 
 @app.route('/cod', methods=['POST'])
@@ -92,10 +103,13 @@ if __name__ == '__main__':
         )
     ''')
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
+        CREATE TABLE IF NOT EXISTS horarios (
             id INTEGER PRIMARY KEY,
-            nome TEXT,
-            idade INT
+            dia_semana TEXT,
+            hora_inicio TIMESTAMP,
+            hora_fim TIMESTAMP,
+            Disciplina VARCHAR,
+            sala TEXT
         )
     ''')
     conn.close()
